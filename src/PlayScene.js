@@ -16,7 +16,31 @@ class PlayScene extends Phaser.Scene {
       .setGravityY(5000)
       .setOrigin(0, 1);
 
+    this.initAnims();
     this.createControll();
+  }
+
+  initAnims() {
+    this.anims.create({
+      key: 'dino-run',
+      frames: this.anims.generateFrameNumbers('dino', {start: 2, end: 3}),
+      frameRate: 10,
+      repeat: -1
+    })
+
+    this.anims.create({
+      key: 'dino-down-anim',
+      frames: this.anims.generateFrameNumbers('dino-down', {start: 0, end: 1}),
+      frameRate: 10,
+      repeat: -1
+    })
+
+    this.anims.create({
+      key: 'enemy-dino-fly',
+      frames: this.anims.generateFrameNumbers('enemy-bird', {start: 0, end: 1}),
+      frameRate: 6,
+      repeat: -1
+    })
   }
 
   createControll() {
@@ -29,6 +53,13 @@ class PlayScene extends Phaser.Scene {
 
   update() {
     this.ground.tilePositionX += this.gameSpeed;
+
+    if (this.dino.body.deltaAbsY() > 0) {
+      this.dino.anims.stop();
+      this.dino.setTexture('dino', 0);
+    } else {
+      this.dino.play('dino-run', true);
+    }
   }
 }
 
