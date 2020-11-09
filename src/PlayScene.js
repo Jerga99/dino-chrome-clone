@@ -28,6 +28,14 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(1, 0)
       .setAlpha(0);
 
+      this.environment = this.add.group();
+      this.environment.addMultiple([
+        this.add.image(width / 2, 170, 'cloud'),
+        this.add.image(width - 80, 80, 'cloud'),
+        this.add.image((width / 1.3), 100, 'cloud')
+      ]);
+      this.environment.setAlpha(0);
+
     this.gameOverScreen = this.add.container(width / 2, height / 2 - 50).setAlpha(0)
     this.gameOverText = this.add.image(0, 0, 'game-over');
     this.restart = this.add.image(0, 80, 'restart').setInteractive();
@@ -92,6 +100,7 @@ class PlayScene extends Phaser.Scene {
             this.isGameRunning = true;
             this.dino.setVelocityX(0);
             this.scoreText.setAlpha(1);
+            this.environment.setAlpha(1);
             startEvent.remove();
           }
         }
@@ -204,6 +213,7 @@ class PlayScene extends Phaser.Scene {
 
     this.ground.tilePositionX += this.gameSpeed;
     Phaser.Actions.IncX(this.obsticles.getChildren(), -this.gameSpeed);
+    Phaser.Actions.IncX(this.environment.getChildren(), - 0.5);
 
     this.respawnTime += delta * this.gameSpeed * 0.08;
     if (this.respawnTime >= 1500) {
@@ -214,6 +224,12 @@ class PlayScene extends Phaser.Scene {
     this.obsticles.getChildren().forEach(obsticle => {
       if (obsticle.getBounds().right < 0) {
         this.obsticles.killAndHide(obsticle);
+      }
+    })
+
+    this.environment.getChildren().forEach(env => {
+      if (env.getBounds().right < 0) {
+        env.x = this.game.config.width + 30;
       }
     })
 
