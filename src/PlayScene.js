@@ -24,6 +24,10 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(1, 0)
       .setAlpha(0);
 
+    this.highScoreText = this.add.text(0, 0, "00000", {fill: "#535353", font: '900 35px Courier', resolution: 5})
+      .setOrigin(1, 0)
+      .setAlpha(0);
+
     this.gameOverScreen = this.add.container(width / 2, height / 2 - 50).setAlpha(0)
     this.gameOverText = this.add.image(0, 0, 'game-over');
     this.restart = this.add.image(0, 80, 'restart').setInteractive();
@@ -42,6 +46,14 @@ class PlayScene extends Phaser.Scene {
 
   initColliders() {
     this.physics.add.collider(this.dino, this.obsticles, () => {
+      this.highScoreText.x = this.scoreText.x - this.scoreText.width - 20;
+
+      const highScore = this.highScoreText.text.substr(this.highScoreText.text.length - 5);
+      const newScore = Number(this.scoreText.text) > Number(highScore) ? this.scoreText.text : highScore;
+
+      this.highScoreText.setText('HI ' + newScore);
+      this.highScoreText.setAlpha(1);
+
       this.physics.pause();
       this.isGameRunning = false;
       this.anims.pauseAll();
