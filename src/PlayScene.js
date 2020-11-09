@@ -11,6 +11,7 @@ class PlayScene extends Phaser.Scene {
     this.gameSpeed = 10;
     this.isGameRunning = false;
     this.respawnTime = 0;
+    this.score = 0;
 
     this.startTrigger = this.physics.add.sprite(0, 10).setOrigin(0, 1).setImmovable();
     this.ground = this.add.tileSprite(0, height, 88, 26, 'ground').setOrigin(0, 1)
@@ -19,6 +20,9 @@ class PlayScene extends Phaser.Scene {
       .setGravityY(5000)
       .setOrigin(0, 1);
 
+    this.scoreText = this.add.text(width, 0, "00000", {fill: "#535353", font: '900 35px Courier', resolution: 5})
+      .setOrigin(1, 0)
+      .setAlpha(0);
 
     this.gameOverScreen = this.add.container(width / 2, height / 2 - 50).setAlpha(0)
     this.gameOverText = this.add.image(0, 0, 'game-over');
@@ -33,6 +37,7 @@ class PlayScene extends Phaser.Scene {
     this.initStartTrigger();
     this.initColliders();
     this.handleInputs();
+    this.handleScore();
   }
 
   initColliders() {
@@ -44,6 +49,7 @@ class PlayScene extends Phaser.Scene {
       this.respawnTime = 0;
       this.gameSpeed = 10;
       this.gameOverScreen.setAlpha(1);
+      this.score = 0;
     }, null, this);
   }
 
@@ -73,6 +79,7 @@ class PlayScene extends Phaser.Scene {
             this.ground.width = width;
             this.isGameRunning = true;
             this.dino.setVelocityX(0);
+            this.scoreText.setAlpha(1);
             startEvent.remove();
           }
         }
@@ -100,6 +107,27 @@ class PlayScene extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('enemy-bird', {start: 0, end: 1}),
       frameRate: 6,
       repeat: -1
+    })
+  }
+
+  handleScore() {
+    this.time.addEvent({
+      delay: 1000/10,
+      loop: true,
+      callbackScope: this,
+      callback: () => {
+        if (!this.isGameRunning) { return; }
+
+        this.score++;
+        this.gameSpeed += 0.01
+
+        const score = Array.from(String(this.score), Number);
+        for (let i = 0; i < 5 - String(this.score).length; i++) {
+          score.unshift(0);
+        }
+
+        this.scoreText.setText(score.join(''));
+      }
     })
   }
 
