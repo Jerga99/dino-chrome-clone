@@ -49,6 +49,20 @@ class PlayScene extends Phaser.Scene {
 
       this.dino.setVelocityY(-1600);
     })
+
+    this.input.keyboard.on('keydown_DOWN', () => {
+      if (!this.dino.body.onFloor()) { return; }
+
+      this.dino.body.height = 58;
+      this.dino.body.offset.y = 34;
+    })
+
+    this.input.keyboard.on('keyup_DOWN', () => {
+      if (!this.dino.body.onFloor()) { return; }
+
+      this.dino.body.height = 92;
+      this.dino.body.offset.y = 0;
+    })
   }
 
   update() {
@@ -58,7 +72,7 @@ class PlayScene extends Phaser.Scene {
       this.dino.anims.stop();
       this.dino.setTexture('dino', 0);
     } else {
-      this.dino.play('dino-run', true);
+      this.dino.body.height <= 58 ? this.dino.play('dino-down-anim', true) : this.dino.play('dino-run', true);
     }
   }
 }
