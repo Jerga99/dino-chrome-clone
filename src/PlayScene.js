@@ -32,7 +32,7 @@ class PlayScene extends Phaser.Scene {
     this.initAnims();
     this.initStartTrigger();
     this.initColliders();
-    this.createControll();
+    this.handleInputs();
   }
 
   initColliders() {
@@ -103,7 +103,18 @@ class PlayScene extends Phaser.Scene {
     })
   }
 
-  createControll() {
+  handleInputs() {
+    this.restart.on('pointerdown', () => {
+      this.dino.setVelocityY(0);
+      this.dino.body.height = 92;
+      this.dino.body.offset.y = 0;
+      this.physics.resume();
+      this.obsticles.clear(true, true);
+      this.isGameRunning = true;
+      this.gameOverScreen.setAlpha(0);
+      this.anims.resumeAll();
+    })
+
     this.input.keyboard.on('keydown_SPACE', () => {
       if (!this.dino.body.onFloor()) { return; }
 
