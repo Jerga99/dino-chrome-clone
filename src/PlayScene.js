@@ -9,9 +9,10 @@ class PlayScene extends Phaser.Scene {
   create() {
     const { height, width } = this.game.config;
     this.gameSpeed = 10;
+    this.isGameRunning = false;
 
     this.startTrigger = this.physics.add.sprite(0, 10).setOrigin(0, 1).setImmovable();
-    this.ground = this.add.tileSprite(0, height, width, 26, 'ground').setOrigin(0, 1)
+    this.ground = this.add.tileSprite(0, height, 88, 26, 'ground').setOrigin(0, 1)
     this.dino = this.physics.add.sprite(0, height, 'dino-idle')
       .setCollideWorldBounds(true)
       .setGravityY(5000)
@@ -23,13 +24,35 @@ class PlayScene extends Phaser.Scene {
   }
 
   initStartTrigger() {
+    const { width, height } = this.game.config;
     this.physics.add.overlap(this.startTrigger, this.dino, () => {
       if (this.startTrigger.y === 10) {
-        this.startTrigger.body.reset(0, this.game.config.height);
+        this.startTrigger.body.reset(0, height);
         return;
       }
 
       this.startTrigger.disableBody(true, true);
+
+      const startEvent =  this.time.addEvent({
+        delay: 1000/60,
+        loop: true,
+        callbackScope: this,
+        callback: () => {
+          this.dino.setVelocityX(80);
+          this.dino.play('dino-run', 1);
+
+          if (this.ground.width < width) {
+            this.ground.width += 17 * 2;
+          }
+
+          if (this.ground.width >= 1000) {
+            this.ground.width = width;
+            this.isGameRunning = true;
+            this.dino.setVelocityX(0);
+            startEvent.remove();
+          }
+        }
+      });
     }, null, this)
   }
 
@@ -79,6 +102,7 @@ class PlayScene extends Phaser.Scene {
   }
 
   update() {
+    if (!this.isGameRunning) { return; }
     this.ground.tilePositionX += this.gameSpeed;
 
     if (this.dino.body.deltaAbsY() > 0) {
