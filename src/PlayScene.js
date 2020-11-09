@@ -107,14 +107,28 @@ class PlayScene extends Phaser.Scene {
     const obsticleNum = Math.floor(Math.random() * 7) + 1;
     const distance = Phaser.Math.Between(600, 900);
 
-    console.log(obsticleNum);
-    console.log(distance);
+    let obsticle;
+    if (obsticleNum > 6) {
+      const enemyHeight = [20, 50];
+      obsticle = this.obsticles.create(this.game.config.width + distance, this.game.config.height - enemyHeight[Math.floor(Math.random() * 2)], `enemy-bird`)
+        .setOrigin(0, 1)
+        obsticle.play('enemy-dino-fly', 1);
+      obsticle.body.height = obsticle.body.height / 1.5;
+    } else {
+      obsticle = this.obsticles.create(this.game.config.width + distance, this.game.config.height, `obsticle-${obsticleNum}`)
+        .setOrigin(0, 1);
+
+     obsticle.body.offset.y = +10;
+    }
+
+    obsticle.setImmovable();
   }
 
   update(time, delta) {
     if (!this.isGameRunning) { return; }
 
     this.ground.tilePositionX += this.gameSpeed;
+    Phaser.Actions.IncX(this.obsticles.getChildren(), -this.gameSpeed);
 
     this.respawnTime += delta * this.gameSpeed * 0.08;
     if (this.respawnTime >= 1500) {
