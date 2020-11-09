@@ -22,7 +22,19 @@ class PlayScene extends Phaser.Scene {
 
     this.initAnims();
     this.initStartTrigger();
+    this.initColliders();
     this.createControll();
+  }
+
+  initColliders() {
+    this.physics.add.collider(this.dino, this.obsticles, () => {
+      this.physics.pause();
+      this.isGameRunning = false;
+      this.anims.pauseAll();
+      this.dino.setTexture('dino-hurt');
+      this.respawnTime = 0;
+      this.gameSpeed = 10;
+    }, null, this);
   }
 
   initStartTrigger() {
@@ -135,6 +147,12 @@ class PlayScene extends Phaser.Scene {
       this.placeObsticle();
       this.respawnTime = 0;
     }
+
+    this.obsticles.getChildren().forEach(obsticle => {
+      if (obsticle.getBounds().right < 0) {
+        this.obsticles.killAndHide(obsticle);
+      }
+    })
 
     if (this.dino.body.deltaAbsY() > 0) {
       this.dino.anims.stop();
