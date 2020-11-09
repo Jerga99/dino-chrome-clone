@@ -13,11 +13,17 @@ class PlayScene extends Phaser.Scene {
     this.respawnTime = 0;
     this.score = 0;
 
+    this.jumpSound = this.sound.add('jump', {volume: 0.2});
+    this.hitSound = this.sound.add('hit', {volume: 0.2});
+    this.reachSound = this.sound.add('reach', {volume: 0.2});
+
     this.startTrigger = this.physics.add.sprite(0, 10).setOrigin(0, 1).setImmovable();
     this.ground = this.add.tileSprite(0, height, 88, 26, 'ground').setOrigin(0, 1)
     this.dino = this.physics.add.sprite(0, height, 'dino-idle')
       .setCollideWorldBounds(true)
       .setGravityY(5000)
+      .setBodySize(44, 92)
+      .setDepth(1)
       .setOrigin(0, 1);
 
     this.scoreText = this.add.text(width, 0, "00000", {fill: "#535353", font: '900 35px Courier', resolution: 5})
@@ -70,6 +76,7 @@ class PlayScene extends Phaser.Scene {
       this.gameSpeed = 10;
       this.gameOverScreen.setAlpha(1);
       this.score = 0;
+      this.hitSound.play();
     }, null, this);
   }
 
@@ -142,6 +149,18 @@ class PlayScene extends Phaser.Scene {
         this.score++;
         this.gameSpeed += 0.01
 
+        if (this.score % 100 === 0) {
+          this.reachSound.play();
+
+          this.tweens.add({
+            targets: this.scoreText,
+            duration: 100,
+            repeat: 3,
+            alpha: 0,
+            yoyo: true
+          })
+        }
+
         const score = Array.from(String(this.score), Number);
         for (let i = 0; i < 5 - String(this.score).length; i++) {
           score.unshift(0);
@@ -167,6 +186,7 @@ class PlayScene extends Phaser.Scene {
     this.input.keyboard.on('keydown_SPACE', () => {
       if (!this.dino.body.onFloor() || this.dino.body.velocity.x > 0) { return; }
 
+      this.jumpSound.play();
       this.dino.body.height = 92;
       this.dino.body.offset.y = 0;
       this.dino.setVelocityY(-1600);
