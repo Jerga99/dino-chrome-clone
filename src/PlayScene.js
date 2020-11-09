@@ -10,6 +10,7 @@ class PlayScene extends Phaser.Scene {
     const { height, width } = this.game.config;
     this.gameSpeed = 10;
     this.isGameRunning = false;
+    this.respawnTime = 0;
 
     this.startTrigger = this.physics.add.sprite(0, 10).setOrigin(0, 1).setImmovable();
     this.ground = this.add.tileSprite(0, height, 88, 26, 'ground').setOrigin(0, 1)
@@ -17,6 +18,7 @@ class PlayScene extends Phaser.Scene {
       .setCollideWorldBounds(true)
       .setGravityY(5000)
       .setOrigin(0, 1);
+    this.obsticles = this.physics.add.group();
 
     this.initAnims();
     this.initStartTrigger();
@@ -101,9 +103,24 @@ class PlayScene extends Phaser.Scene {
     })
   }
 
-  update() {
+  placeObsticle() {
+    const obsticleNum = Math.floor(Math.random() * 7) + 1;
+    const distance = Phaser.Math.Between(600, 900);
+
+    console.log(obsticleNum);
+    console.log(distance);
+  }
+
+  update(time, delta) {
     if (!this.isGameRunning) { return; }
+
     this.ground.tilePositionX += this.gameSpeed;
+
+    this.respawnTime += delta * this.gameSpeed * 0.08;
+    if (this.respawnTime >= 1500) {
+      this.placeObsticle();
+      this.respawnTime = 0;
+    }
 
     if (this.dino.body.deltaAbsY() > 0) {
       this.dino.anims.stop();
