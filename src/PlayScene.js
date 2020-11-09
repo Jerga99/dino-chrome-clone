@@ -10,6 +10,7 @@ class PlayScene extends Phaser.Scene {
     const { height, width } = this.game.config;
     this.gameSpeed = 10;
 
+    this.startTrigger = this.physics.add.sprite(0, 10).setOrigin(0, 1).setImmovable();
     this.ground = this.add.tileSprite(0, height, width, 26, 'ground').setOrigin(0, 1)
     this.dino = this.physics.add.sprite(0, height, 'dino-idle')
       .setCollideWorldBounds(true)
@@ -17,7 +18,19 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(0, 1);
 
     this.initAnims();
+    this.initStartTrigger();
     this.createControll();
+  }
+
+  initStartTrigger() {
+    this.physics.add.overlap(this.startTrigger, this.dino, () => {
+      if (this.startTrigger.y === 10) {
+        this.startTrigger.body.reset(0, this.game.config.height);
+        return;
+      }
+
+      this.startTrigger.disableBody(true, true);
+    }, null, this)
   }
 
   initAnims() {
